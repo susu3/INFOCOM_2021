@@ -9,6 +9,9 @@ import org.apache.poi.ss.usermodel.Workbook;  //对应Excel文档
 import org.apache.poi.xssf.usermodel.XSSFWorkbook; //对应xlsx格式的excel文档
 import org.apache.commons.compress.*;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.FileNotFoundException;
 
 public class Dataprocess {
 
@@ -27,21 +30,35 @@ public class Dataprocess {
             int rownum = sheet.getPhysicalNumberOfRows();
             //获取最大列数
             //int colnum = row.getPhysicalNumberOfCells();
-            for(int i= 1;i<rownum;i++){
+//            row = sheet
+            for(int i= 1;i<sheet.getLastRowNum();i++){
+            //for(int i= 1;i<100;i++){
+                System.out.print(i);
                 row = sheet.getRow(i);
-                if(row !=null ){
+                if(row !=null ) {
                     //start_time>=end_time || coderate <=0
-                    if(row.getCell(2).getNumericCellValue()>=row.getCell(3).getNumericCellValue() || row.getCell(4).getNumericCellValue()<=0)
-                        sheet.removeRow(row);
+                    if (row.getCell(2).getNumericCellValue() >= row.getCell(3).getNumericCellValue() || row.getCell(4).getNumericCellValue() <= 0){
+//                        sheet.removeRow(row);
+                        sheet.shiftRows(row.getRowNum() + 1, sheet.getLastRowNum() + 1, -1);
+                    i--;
+                }
+
                 }
             }
         }
+        try {
+            FileOutputStream outputStream = new FileOutputStream("new_"+filePath);
+            wb.write(outputStream);
+        } catch (FileNotFoundException fe) {
+            fe.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+            }
     }
 
+
     public static void main(String[] args) {
-        System.out.print("start");
-        Dataprocess.Userprocess("user.xlsx");
-        System.out.print("end");
+        //Dataprocess.Userprocess("user.xlsx");
 
     }
 
