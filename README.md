@@ -12,7 +12,7 @@
 
 1）baseline:
 
-Random, min_cost, Gale-Shapley algorithm
+Random, greedy, Gale-Shapley algorithm(check)
 
 2）变化的变量：
 
