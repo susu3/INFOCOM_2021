@@ -3,8 +3,9 @@ public class Request {
     private int arrivetime;
     private int endtime;
     //private int fileID;
-    private int speed;
+    private double speed;
     private String label;
+    private int cdnIndex;
 
     public int getID() {
         return ID;
@@ -18,12 +19,16 @@ public class Request {
         return endtime;
     }
 
-    public int getSpeed() {
+    public double getSpeed() {
         return speed;
     }
 
     public String getLabel() {
         return label;
+    }
+
+    public int getCdnIndex() {
+        return cdnIndex;
     }
 
     public void setID(int ID) {
@@ -38,11 +43,15 @@ public class Request {
         this.endtime = endtime;
     }
 
-    public void setSpeed(int speed) {
+    public void setSpeed(double speed) {
         this.speed = speed;
     }
 
     public void setLabel(String label) {
         this.label = label;
+    }
+
+    public void setCdnIndex(int cdnIndex) {
+        this.cdnIndex = cdnIndex;
     }
 }

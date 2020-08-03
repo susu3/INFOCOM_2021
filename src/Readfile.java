@@ -28,6 +28,7 @@ public class Readfile {
         Row row = null;
         String cellDatastring = null;
         int cellDataint=0;
+        double cellDatad=0;
 
         wb = Readfile.readExcel(filePath);
         request.clear();
@@ -53,8 +54,8 @@ public class Readfile {
                     request1.setArrivetime(cellDataint-1591790399);   //使时间从0算起
                     cellDataint=(int)row.getCell(3).getNumericCellValue();
                     request1.setEndtime(cellDataint-1591790399);
-                    cellDataint=(int)row.getCell(4).getNumericCellValue();
-                    request1.setSpeed(cellDataint);
+                    cellDatad=row.getCell(4).getNumericCellValue();
+                    request1.setSpeed(cellDatad);
                 }else{
                     break;
                 }
@@ -93,6 +94,7 @@ public class Readfile {
                     cdn1.setLabel(cellDatastring);
                     cellDataint=row.getCell(2).getNumericCellValue();
                     cdn1.setBandwidth(cellDataint*1.2);   //bandwidth capacity = peak * 1.2
+                    cdn1.setBandwidth_cap(cellDataint*1.2);
                     cdn1.setBcost(randomBcost(cellDataint/1024));  //
 
                     if(cdn.containsKey(cellDatastring)){
