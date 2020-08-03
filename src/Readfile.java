@@ -18,97 +18,111 @@ import org.apache.commons.compress.*;
 public class Readfile {
 
 
-    //读取用户文件
+    //读取用户文件,request用LinkedList来保存
     //String filePath = "user.xlsx";
     //String columns[] = {"stream","label","start_time","end_time","coderate"};
     //num：取多少条记录
-    public static LinkedList<Request> getUser(LinkedList<Request> request, String filePath, int num){
+    public static void getUser(LinkedList<Request> request, String filePath, int num){
         Workbook wb =null;
         Sheet sheet = null;
         Row row = null;
-        String cellDatas = null;
-        int cellDatan=0;
+        String cellDatastring = null;
+        int cellDataint=0;
 
         wb = Readfile.readExcel(filePath);
-
+        request.clear();
 
         if(wb != null){
             //获取第一个sheet
             sheet = wb.getSheetAt(0);
             //获取最大行数
             int rownum = sheet.getPhysicalNumberOfRows();
-            //获取最大列数
-            int colnum = row.getPhysicalNumberOfCells();
             //获取第一行
             row = sheet.getRow(0);
+            //获取最大列数
+            //int colnum = row.getPhysicalNumberOfCells();
 
             for (int i = 1; i<rownum && i<num; i++) {
                 Request request1= new Request();
                 row = sheet.getRow(i);
-                if(row !=null && colnum<=5){
+                if(row !=null){
                     request1.setID(i);
-                    cellDatas=row.getCell(1).getStringCellValue();
-                    request1.setLabel(cellDatas);
-                    cellDatan=(int)row.getCell(2).getNumericCellValue();
-                    request1.setArrivetime(cellDatan-1591790399);   //使时间从0算起
-                    cellDatan=(int)row.getCell(3).getNumericCellValue();
-                    request1.setEndtime(cellDatan-1591790399);
-                    cellDatan=(int)row.getCell(4).getNumericCellValue();
-                    request1.setSpeed(cellDatan);
+                    cellDatastring=row.getCell(1).getStringCellValue();
+                    request1.setLabel(cellDatastring);
+                    cellDataint=(int)row.getCell(2).getNumericCellValue();
+                    request1.setArrivetime(cellDataint-1591790399);   //使时间从0算起
+                    cellDataint=(int)row.getCell(3).getNumericCellValue();
+                    request1.setEndtime(cellDataint-1591790399);
+                    cellDataint=(int)row.getCell(4).getNumericCellValue();
+                    request1.setSpeed(cellDataint);
                 }else{
                     break;
                 }
                 request.add(request1);
             }
         }
-        return request;
+        //return request;
     }
 
-    //读取CDN文件
+    //读取CDN文件，CDN用HashMap来保存
     //ArrayList<CDN> cdn =new ArrayList<CDN>();
-    //String filePath = "user.xlsx";
-    //String columns[] = {"node_name","label"};
-    //num：取多少条记录
-    public static ArrayList<CDN> getCDN(ArrayList<CDN> cdn, String filePath, int num){
+    //String filePath = "CDN.xlsx";
+    //String columns[] = {"label","name","peak"};
+    public static void getCDN(HashMap<String,ArrayList<CDN>> cdn, String filePath, int num){
         Workbook wb =null;
         Sheet sheet = null;
         Row row = null;
-        String cellDatas = null;
+        String cellDatastring = null;
+        double cellDataint = 0;
 
         wb = Readfile.readExcel(filePath);
+        cdn.clear();
 
         if(wb != null){
-            //获取最大行数
-            int rownum = sheet.getPhysicalNumberOfRows();
-            //获取最大列数
-            int colnum = row.getPhysicalNumberOfCells();
-            //获取第一个sheet
             sheet = wb.getSheetAt(0);
-            //获取第一行
             row = sheet.getRow(0);
+            int rownum = sheet.getPhysicalNumberOfRows();
 
-            for (int i = 1; i<rownum && i<num; i++) {
-                CDN cdn1= new CDN();
-                row = sheet.getRow(i);
-                if(row !=null && colnum<=5){
+            for (int i = 1; i<rownum&&i<num; i++) {
+                if(row !=null){
+                    row = sheet.getRow(i);
+                    cellDatastring=row.getCell(0).getStringCellValue();  //get label
+
+                    CDN cdn1= new CDN();
                     cdn1.setID(i);
-                    cellDatas=row.getCell(1).getStringCellValue();
-                    cdn1.setLabel(cellDatas);
+                    cdn1.setLabel(cellDatastring);
+                    cellDataint=row.getCell(2).getNumericCellValue();
+                    cdn1.setBandwidth(cellDataint*1.2);   //bandwidth capacity = peak * 1.2
+                    cdn1.setBcost(randomBcost(cellDataint/1024));  //
+
+                    if(cdn.containsKey(cellDatastring)){
+                        ArrayList<CDN> cdn2 =cdn.get(cellDatastring);
+                        cdn2.add(cdn1);
+                        cdn.put(cellDatastring,cdn2);
+                    }else{
+                        ArrayList<CDN> cdn2 = new ArrayList<CDN>();
+                        cdn2.add(cdn1);
+                        cdn.put(cellDatastring,cdn2);
+                    }
                 }else{
                     break;
                 }
-                //cdn1.setBandwidth(); //?????????????????????????????????
-                //cdn1.setBcost();  //?????????????????????????????
-                cdn.add(cdn1);
             }
         }
-        return cdn;
+        //return cdn;
     }
 
-    private static double randomNum(){
-        Random ran= new Random();
-        double num=ran.nextGaussian();
-        return num;
+    private static double randomBcost(double bandwidth){
+        if(bandwidth>0 && bandwidth<=100)
+            return 0.082;
+        else if(bandwidth> 100 && bandwidth<=500)
+            return 0.08;
+        else if(bandwidth> 5 && bandwidth<=5*1024)
+            return 0.077;
+        else if(bandwidth>5*1024)
+            return 0.075;
+        else
+            return 0;
     }
 
     //读取excel
@@ -116,7 +130,9 @@ public class Readfile {
         Workbook wb = null;
 
         if(filePath==null){
-            return null;
+            System.out.println("filePath == null");
+            System.exit(0);
+            //return null;
         }
 
         String extString = filePath.substring(filePath.lastIndexOf("."));
@@ -126,13 +142,39 @@ public class Readfile {
             if(".xlsx".equals(extString)){
                 return wb = new XSSFWorkbook(is);
             }else{
-                return wb = null;
+                System.out.println("not a .xlsx file");
+                System.exit(0);
+                //return wb = null;
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
 
+        System.exit(1);
         return wb;
     }
 
+    public static void main(String[] args) {
+        //test:
+        //public static LinkedList<Request> getUser(LinkedList<Request> request, String filePath, int num)
+//        LinkedList<Request> a = new LinkedList<Request>();
+//        Readfile.getUser(a,"user.xlsx",10);
+//        for(Request s:a)
+//            System.out.println(s.getID()+" "+s.getArrivetime()+" "+s.getEndtime()+" "+s.getSpeed()+" "+s.getLabel());
+        //public static HashMap<String,ArrayList<CDN>> getCDN(HashMap<String,ArrayList<CDN>> cdn, String filePath){
+        HashMap<String,ArrayList<CDN>> b = new HashMap<String,ArrayList<CDN>>();
+        Readfile.getCDN(b,"CDN.xlsx",10);
+        Set<String> keys=b.keySet();
+        Iterator<String> iterator1=keys.iterator();
+        while (iterator1.hasNext()){
+            System.out.print(iterator1.next() +", ");
+        }
+        ArrayList<CDN> c = b.get("安徽");
+        for(CDN c1:c)
+            System.out.println(c1.getID()+" "+c1.getBandwidth()+" "+c1.getBcost()+" "+c1.getLabel());
+
+
+
+
+    }
 }
