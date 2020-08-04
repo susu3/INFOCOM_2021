@@ -51,8 +51,11 @@ public class Alg_Random {
                     tar_cdn.setBandwidth(tar_cdn.getBandwidth()+tar_s.getSpeed());
                 }else
                     continue;
-            }else
+            }else{
+                System.out.print("algRandom label bug!");
                 System.exit(1);
+            }
+
         }
 
         total_cost = CDN.computeCost(cdn);
@@ -65,6 +68,8 @@ public class Alg_Random {
         Random ran = new Random();
         return ran.nextInt(num);
     }
+
+
 }
 
 
