@@ -84,7 +84,7 @@ public class Readfile {
             row = sheet.getRow(0);
             int rownum = sheet.getPhysicalNumberOfRows();
 
-            for (int i = 1; i<rownum&&i<num; i++) {
+            for (int i = 1; i<rownum && i<num; i++) {
                 if(row !=null){
                     row = sheet.getRow(i);
                     cellDatastring=row.getCell(0).getStringCellValue();  //get label
@@ -106,6 +106,49 @@ public class Readfile {
                         cdn2.add(cdn1);
                         cdn.put(cellDatastring,cdn2);
                     }
+                }else{
+                    break;
+                }
+            }
+        }
+        //return cdn;
+    }
+
+    //读取CDN文件，不考虑label的情况下，CDN用ArrayList来保存
+    //ArrayList<CDN> cdn =new ArrayList<CDN>();
+    //String filePath = "CDN.xlsx";
+    //String columns[] = {"label","name","peak"};
+    //CDN ID 从0开始编号
+    public static void getCDN(ArrayList<CDN> cdn, String filePath, int num){
+        Workbook wb =null;
+        Sheet sheet = null;
+        Row row = null;
+        String cellDatastring = null;
+        double cellDataint = 0;
+
+        wb = Readfile.readExcel(filePath);
+        cdn.clear();
+
+        if(wb != null){
+            sheet = wb.getSheetAt(0);
+            row = sheet.getRow(0);
+            int rownum = sheet.getPhysicalNumberOfRows();
+
+            for (int i = 0; i<num && i<rownum; i++) {
+                if(row !=null){
+                    row = sheet.getRow(i);
+
+                    CDN cdn1= new CDN();
+
+                    cdn1.setID(i);
+                    cellDatastring=row.getCell(0).getStringCellValue();  //get label
+                    cdn1.setLabel(cellDatastring);
+                    cellDataint=row.getCell(2).getNumericCellValue();
+                    cdn1.setBandwidth(cellDataint*1.2);   //bandwidth capacity = peak * 1.2
+                    cdn1.setBandwidth_cap(cellDataint*1.2);
+                    cdn1.setBcost(randomBcost(cellDataint/1024));  //set cost
+
+                    cdn.add(cdn1);
                 }else{
                     break;
                 }

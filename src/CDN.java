@@ -74,4 +74,10 @@ public class CDN {
         }
         return cost;
     }
+
+    public static void updatePeak(CDN tar_cdn){
+        if (tar_cdn.getPeak() < (tar_cdn.getBandwidth_cap() - tar_cdn.getBandwidth()))  //更新peak
+            tar_cdn.setPeak((tar_cdn.getBandwidth_cap() - tar_cdn.getBandwidth()));
+    }
+
 }

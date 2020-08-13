@@ -1,11 +1,5 @@
 import javax.xml.crypto.Data;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Random;
-import java.util.Date;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 import java.util.concurrent.CountDownLatch;
 
 public class Alg_Random {
@@ -21,7 +15,7 @@ public class Alg_Random {
             queue.push(request.get(i),i);
         }
 
-        PriorityStruct ps = new PriorityStruct();
+        PriorityStruct ps;
         while(!queue.isEmpty()){
             ps=queue.pop();
             Request s = ps.getRequest();
@@ -37,8 +31,9 @@ public class Alg_Random {
                     }while(tar_cdn.getBandwidth()<s.getSpeed());
                     request.get(ps.getIndex()).setCdnIndex(target);
                     tar_cdn.setBandwidth(tar_cdn.getBandwidth()-s.getSpeed());
-                    if (tar_cdn.getPeak() < (tar_cdn.getBandwidth_cap() - tar_cdn.getBandwidth()))  //更新peak
-                        tar_cdn.setPeak((tar_cdn.getBandwidth_cap() - tar_cdn.getBandwidth()));
+                    CDN.updatePeak(tar_cdn);   //更新peak
+//                    if (tar_cdn.getPeak() < (tar_cdn.getBandwidth_cap() - tar_cdn.getBandwidth()))
+//                        tar_cdn.setPeak((tar_cdn.getBandwidth_cap() - tar_cdn.getBandwidth()));
                 }else
                     continue;
 
@@ -67,6 +62,29 @@ public class Alg_Random {
     private int randomCDN(int num) {
         Random ran = new Random();
         return ran.nextInt(num);
+    }
+
+    public static void main(String[] args) {
+        //test:
+        LinkedList<Request> a = new LinkedList<Request>();
+        Readfile.getUser(a,"user.xlsx",10);
+        for(Request s:a)
+            System.out.println(s.getID()+" "+s.getArrivetime()+" "+s.getEndtime()+" "+s.getSpeed()+" "+s.getLabel());
+        //public static HashMap<String,ArrayList<CDN>> getCDN(HashMap<String,ArrayList<CDN>> cdn, String filePath){
+        HashMap<String,ArrayList<CDN>> b = new HashMap<String,ArrayList<CDN>>();
+        Readfile.getCDN(b,"CDN.xlsx",10);
+        Set<String> keys=b.keySet();
+        Iterator<String> iterator1=keys.iterator();
+        while (iterator1.hasNext()){
+            System.out.print(iterator1.next() +", ");
+        }
+        ArrayList<CDN> c = b.get("安徽");
+        for(CDN c1:c)
+            System.out.println(c1.getID()+" "+c1.getBandwidth()+" "+c1.getBcost()+" "+c1.getLabel());
+
+
+
+
     }
 
 

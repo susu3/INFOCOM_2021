@@ -61,5 +61,6 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="library" name="cplex" level="project" />
   </component>
 </module>
