@@ -61,6 +61,14 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="library" name="cplex" level="project" />
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/cplex.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
   </component>
 </module>

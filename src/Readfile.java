@@ -43,7 +43,7 @@ public class Readfile {
             //获取最大列数
             //int colnum = row.getPhysicalNumberOfCells();
 
-            for (int i = 1; i<rownum && i<num; i++) {
+            for (int i = 1; i<rownum && i<num+1; i++) {
                 Request request1= new Request();
                 row = sheet.getRow(i);
                 if(row !=null){
@@ -84,7 +84,7 @@ public class Readfile {
             row = sheet.getRow(0);
             int rownum = sheet.getPhysicalNumberOfRows();
 
-            for (int i = 1; i<rownum && i<num; i++) {
+            for (int i = 1; i<rownum && i<num+1; i++) {
                 if(row !=null){
                     row = sheet.getRow(i);
                     cellDatastring=row.getCell(0).getStringCellValue();  //get label
@@ -96,6 +96,7 @@ public class Readfile {
                     cdn1.setBandwidth(cellDataint*1.2);   //bandwidth capacity = peak * 1.2
                     cdn1.setBandwidth_cap(cellDataint*1.2);
                     cdn1.setBcost(randomBcost(cellDataint/1024));  //
+                    cdn1.setPeak(0);
 
                     if(cdn.containsKey(cellDatastring)){
                         ArrayList<CDN> cdn2 =cdn.get(cellDatastring);
@@ -118,7 +119,7 @@ public class Readfile {
     //ArrayList<CDN> cdn =new ArrayList<CDN>();
     //String filePath = "CDN.xlsx";
     //String columns[] = {"label","name","peak"};
-    //CDN ID 从0开始编号
+    //
     public static void getCDN(ArrayList<CDN> cdn, String filePath, int num){
         Workbook wb =null;
         Sheet sheet = null;
@@ -134,24 +135,27 @@ public class Readfile {
             row = sheet.getRow(0);
             int rownum = sheet.getPhysicalNumberOfRows();
 
-            for (int i = 0; i<num && i<rownum; i++) {
+            for (int i = 1; i<num+1 && i<rownum; i++) {
                 if(row !=null){
                     row = sheet.getRow(i);
+                    cellDataint = row.getCell(2).getNumericCellValue();
+                    if(cellDataint!= 0) {
+                        CDN cdn1 = new CDN();
 
-                    CDN cdn1= new CDN();
+                        cdn1.setID(i);
+                        cellDatastring = row.getCell(0).getStringCellValue();  //get label
+                        cdn1.setLabel(cellDatastring);
+                        cdn1.setBandwidth(cellDataint * 1.2);   //bandwidth capacity = peak * 1.2
+                        cdn1.setBandwidth_cap(cellDataint * 1.2);
+                        cdn1.setBcost(randomBcost(cellDataint / 1024));  //set cost
+                        //cdn1.setBcost(1);  //set cost
+                        cdn1.setPeak(0);
 
-                    cdn1.setID(i);
-                    cellDatastring=row.getCell(0).getStringCellValue();  //get label
-                    cdn1.setLabel(cellDatastring);
-                    cellDataint=row.getCell(2).getNumericCellValue();
-                    cdn1.setBandwidth(cellDataint*1.2);   //bandwidth capacity = peak * 1.2
-                    cdn1.setBandwidth_cap(cellDataint*1.2);
-                    cdn1.setBcost(randomBcost(cellDataint/1024));  //set cost
-
-                    cdn.add(cdn1);
-                }else{
+                        cdn.add(cdn1);
+                    }else
+                        num++;
+                }else
                     break;
-                }
             }
         }
         //return cdn;
@@ -222,4 +226,6 @@ public class Readfile {
 
 
     }
+
+
 }
